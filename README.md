@@ -5,4 +5,5 @@ Notes, configs, and runbooks for my homelab setup. Stored here for reference and
 ## Structure
 
 - `pi-hole/` — Pi-hole ad blocking setup
+- `tailscale/` — Tailscale configuration and integrations
 - `network/` — Network configuration notes
