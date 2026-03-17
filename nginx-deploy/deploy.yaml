@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test
+    hello: world
+  name: test
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: test
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - image: nginx:1.29.4
+        name: nginx
