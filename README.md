@@ -4,6 +4,7 @@ Notes, configs, and runbooks for my homelab setup. Stored here for reference and
 
 ## Structure
 
-- `pi-hole/` — Pi-hole ad blocking setup
+- `pi-hole/` — Pi-hole ad blocking, local DNS for k8s services
 - `tailscale/` — Tailscale configuration and integrations
-- `network/` — Network configuration notes
+- `k3s-node-setup-playbook/` — k3s cluster setup, Tailscale operator, exposing services
+- `mealie/` — Mealie recipe manager deployment and ingress

@@ -55,6 +55,27 @@ Brave bypasses Pi-hole when Shields are on. To make Brave use Pi-hole:
 
 When a VPN is active on a device, DNS is handled by the VPN and Pi-hole is bypassed on that device. This is expected behaviour.
 
+## Local DNS for k8s Services
+
+Services exposed via the Tailscale operator get a `100.x.x.x` Tailscale IP. To access them by hostname on your home network, add a DNS record in Pi-hole:
+
+**Local DNS → DNS Records:**
+
+| Domain | IP |
+|--------|----|
+| `mealie.home` | Tailscale IP of Traefik service |
+
+To find the IP:
+```bash
+kubectl get svc -n kube-system traefik
+```
+
+Add new services here as they're exposed. All devices connected to Tailscale (or on the home network with Pi-hole as DNS) will resolve the hostname.
+
+> **Note:** These are Tailscale IPs — only reachable from devices with Tailscale connected.
+
+---
+
 ## Useful Commands
 
 ```bash

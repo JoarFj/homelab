@@ -72,31 +72,32 @@ sed -i '' 's/127.0.0.1/100.x.x.x/g' ~/.kube/config # macOS
 
 ## Exposing Services
 
+The cluster runs entirely over Tailscale (nodes use `100.x.x.x` as their node IPs, flannel runs over `tailscale0`). MetalLB L2 mode does not work in this setup — it relies on ARP which doesn't propagate correctly over Tailscale/WiFi.
+
 **Quick access — port-forward:**
 ```bash
 kubectl port-forward svc/<name> 9000:9000 -n <namespace>
 ```
 
-**Permanent — externalIPs** (brittle if pod reschedules):
-```yaml
-spec:
-  type: LoadBalancer
-  externalIPs:
-  - 100.x.x.x   # Tailscale IP of the node the pod runs on
-```
+**Permanent — Tailscale operator** (each service gets its own Tailscale IP):
 
-**Best — Tailscale operator** (each service gets its own Tailscale IP):
-```bash
-helm repo add tailscale https://pkgs.tailscale.com/helmcharts
-helm install tailscale-operator tailscale/tailscale-operator \
-  -n tailscale-operator --create-namespace \
-  --set oauth.clientId=<id> --set oauth.clientSecret=<secret>
-```
+The Tailscale operator is installed in the `tailscale` namespace. To expose a service, set `loadBalancerClass: tailscale`:
+
 ```yaml
 spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
 ```
+
+The operator assigns a `100.x.x.x` Tailscale IP to the service. Add a Pi-hole local DNS record pointing your chosen hostname to that IP.
+
+> **Note:** Services are only reachable from devices connected to Tailscale.
+
+---
+
+## Tailscale Operator Setup
+
+See `tailscale-operator.md` for full installation notes.
 
 ---
 
@@ -107,4 +108,5 @@ spec:
 | Worker shows LAN IP | Add config.yaml before installing, restart `k3s-agent` |
 | Worker not joining | `ping 100.x.x.x` must work both ways first |
 | Node stuck `NotReady` | `sudo journalctl -u k3s-agent -f` — usually token mismatch |
-| Service stuck `<pending>` | Check Klipper pod logs, confirm port isn't already in use |
+| Service stuck `<pending>` | Check Tailscale operator pod logs in `tailscale` namespace |
+| MetalLB IP assigned instead of Tailscale | `loadBalancerClass: tailscale` is immutable — delete and recreate the service |
