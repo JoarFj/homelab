@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: linkding 
+  name: linkding
+  namespace: linkding
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linkding
+  template:
+    metadata:
+      labels:
+        app: linkding
+    spec:
+      containers:
+      - image: sissbruecker/linkding:1.45.0
+        name: linkding
+        env:
+          - name: LD_SUPERUSER_NAME
+            valueFrom:
+              secretKeyRef:
+                name: linkding-superuser
+                key: LD_SUPERUSER_NAME
+          - name: LD_SUPERUSER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: linkding-superuser
+                key: LD_SUPERUSER_PASSWORD
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - name: linkding-data
+          mountPath: /etc/linkding/data
+      volumes:
+      - name: linkding-data
+        persistentVolumeClaim:
+          claimName: linkding-data
